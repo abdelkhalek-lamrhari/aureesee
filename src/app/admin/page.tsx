@@ -157,6 +157,24 @@ export default function AdminPage() {
     }
   }
 
+  const updateOrderStatus = async (orderId: string, status: string) => {
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ orderId, status }),
+      })
+
+      if (response.ok) {
+        await fetchOrders()
+      }
+    } catch (error) {
+      console.error('Error updating order status:', error)
+    }
+  }
+
   const testEmail = async () => {
     try {
       const response = await fetch('/api/test-email')
@@ -339,62 +357,62 @@ export default function AdminPage() {
         )}
 
         {/* Products Table */}
-        <div className="bg-background rounded-sm shadow-sm overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-secondary">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium tracking-widest uppercase">Product</th>
-                <th className="px-6 py-3 text-left text-xs font-medium tracking-widest uppercase">Category</th>
-                <th className="px-6 py-3 text-left text-xs font-medium tracking-widest uppercase">Price</th>
-                <th className="px-6 py-3 text-left text-xs font-medium tracking-widest uppercase">Stock</th>
-                <th className="px-6 py-3 text-left text-xs font-medium tracking-widest uppercase">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {products.map((product) => (
-                <tr key={product.id} className="hover:bg-secondary/50">
-                  <td className="px-6 py-4">
-                    <div>
-                      <div className="font-light tracking-wide">{product.name}</div>
-                      {product.collection && (
-                        <div className="text-sm text-muted-foreground">{product.collection}</div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm">{product.category}</td>
-                  <td className="px-6 py-4 text-sm">${product.price}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex px-2 py-1 text-xs font-light rounded-full ${
-                      product.inStock 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {product.inStock ? 'In Stock' : 'Out of Stock'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleEdit(product)}
-                        className="p-1 hover:text-accent transition-colors"
-                      >
-                        <Edit size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(product.id)}
-                        className="p-1 hover:text-red-500 transition-colors"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
+        {activeTab === 'products' && (
+          <div className="bg-background rounded-sm shadow-sm overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-secondary">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium tracking-widest uppercase">Product</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium tracking-widest uppercase">Category</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium tracking-widest uppercase">Price</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium tracking-widest uppercase">Stock</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium tracking-widest uppercase">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+              </thead>
+              <tbody className="divide-y">
+                {products.map((product) => (
+                  <tr key={product.id} className="hover:bg-secondary/50">
+                    <td className="px-6 py-4">
+                      <div>
+                        <div className="font-light tracking-wide">{product.name}</div>
+                        {product.collection && (
+                          <div className="text-sm text-muted-foreground">{product.collection}</div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm">{product.category}</td>
+                    <td className="px-6 py-4 text-sm">${product.price}</td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex px-2 py-1 text-xs font-light rounded-full ${
+                        product.inStock 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {product.inStock ? 'In Stock' : 'Out of Stock'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEdit(product)}
+                          className="p-1 hover:text-accent transition-colors"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(product.id)}
+                          className="p-1 hover:text-red-500 transition-colors"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
         {/* Orders Table */}
         {activeTab === 'orders' && (
@@ -480,105 +498,3 @@ export default function AdminPage() {
     </div>
   )
 }
-          <div className="bg-background rounded-sm shadow-sm overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-secondary">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-widest uppercase">Order ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-widest uppercase">Customer</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-widest uppercase">Total</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-widest uppercase">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-widest uppercase">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-widest uppercase">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-secondary/50">
-                    <td className="px-6 py-4">
-                      <div className="font-light tracking-wide">{order.id}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {order.items.map((item, idx) => (
-                          <div key={idx}>
-                            {item.quantity}x {item.product.name}
-                          </div>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="font-light tracking-wide">{order.user.name}</div>
-                      <div className="text-sm text-muted-foreground">{order.user.email}</div>
-                    </td>
-                    <td className="px-6 py-4 text-sm">${order.total.toFixed(2)}</td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex px-2 py-1 text-xs font-light rounded-full ${
-                        order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                        order.status === 'processing' ? 'bg-blue-100 text-blue-800' :
-                        order.status === 'shipped' ? 'bg-green-100 text-green-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {order.status.toUpperCase()}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      {new Date(order.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => window.open(`mailto:${order.user.email}`)}
-                          className="p-1 hover:text-accent transition-colors"
-                          title="Email customer"
-                        >
-                          <Eye size={16} />
-                        </button>
-                        {order.status === 'pending' && (
-                          <button
-                            onClick={() => updateOrderStatus(order.id, 'processing')}
-                            className="p-1 hover:text-blue-500 transition-colors"
-                            title="Mark as processing"
-                          >
-                            <Package size={16} />
-                          </button>
-                        )}
-                        {order.status === 'processing' && (
-                          <button
-                            onClick={() => updateOrderStatus(order.id, 'shipped')}
-                            className="p-1 hover:text-green-500 transition-colors"
-                            title="Mark as shipped"
-                          >
-                            <Package size={16} />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
-
-const updateOrderStatus = async (orderId: string, status: string) => {
-  try {
-    const response = await fetch('/api/orders', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ orderId, status }),
-    })
-
-    if (response.ok) {
-      // Refresh orders
-      const ordersResponse = await fetch('/api/orders')
-      const ordersData = await ordersResponse.json()
-      setOrders(ordersData)
-    }
-  } catch (error) {
-    console.error('Error updating order status:', error)
-  }
