@@ -52,20 +52,16 @@ export default function AdminPage() {
   const router = useRouter()
 
   useEffect(() => {
-    // Check authentication
     const isAuthenticated = localStorage.getItem('admin_auth')
-    console.log('Admin auth check:', isAuthenticated)
     
     if (!isAuthenticated) {
-      console.log('Not authenticated, redirecting to login')
       router.replace('/login')
       return
     }
 
-    console.log('Authenticated, fetching data')
     fetchProducts()
     fetchOrders()
-  }, [])
+  }, [router])
 
   const fetchProducts = async () => {
     try {
@@ -93,8 +89,11 @@ export default function AdminPage() {
     e.preventDefault()
     
     try {
-      const response = await fetch('/api/products', {
-        method: 'POST',
+      const url = editingProduct ? `/api/products/${editingProduct.id}` : '/api/products'
+      const method = editingProduct ? 'PUT' : 'POST'
+      
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -109,7 +108,7 @@ export default function AdminPage() {
         resetForm()
       }
     } catch (error) {
-      console.error('Error creating product:', error)
+      console.error('Error saving product:', error)
     }
   }
 
@@ -212,20 +211,20 @@ export default function AdminPage() {
           <div className="flex gap-2">
             <button
               onClick={testEmail}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white hover:bg-green-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white hover:bg-green-700 transition-colors rounded"
             >
               📧 Test Email
             </button>
             <button
               onClick={() => setShowForm(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-accent text-accent-foreground hover:bg-accent/90 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-accent text-accent-foreground hover:bg-accent/90 transition-colors rounded"
             >
               <Plus size={20} />
               Add Product
             </button>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white hover:bg-red-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white hover:bg-red-700 transition-colors rounded"
             >
               <LogOut size={20} />
               Logout
@@ -233,7 +232,6 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* Tabs */}
         <div className="flex border-b mb-8">
           <button
             onClick={() => setActiveTab('products')}
@@ -257,7 +255,6 @@ export default function AdminPage() {
           </button>
         </div>
 
-        {/* Product Form Modal */}
         {showForm && (
           <div className="fixed inset-0 z-50 overflow-y-auto">
             <div className="flex min-h-full items-center justify-center p-4">
@@ -280,6 +277,7 @@ export default function AdminPage() {
                     />
                     <input
                       type="number"
+                      step="0.01"
                       placeholder="Price"
                       required
                       value={formData.price}
@@ -338,14 +336,14 @@ export default function AdminPage() {
                   <div className="flex gap-4">
                     <button
                       type="submit"
-                      className="px-6 py-2 bg-accent text-accent-foreground hover:bg-accent/90 transition-colors"
+                      className="px-6 py-2 bg-accent text-accent-foreground hover:bg-accent/90 transition-colors rounded"
                     >
                       {editingProduct ? 'Update' : 'Create'} Product
                     </button>
                     <button
                       type="button"
                       onClick={resetForm}
-                      className="px-6 py-2 border border-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                      className="px-6 py-2 border border-primary hover:bg-primary hover:text-primary-foreground transition-colors rounded"
                     >
                       Cancel
                     </button>
@@ -356,7 +354,6 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* Products Table */}
         {activeTab === 'products' && (
           <div className="bg-background rounded-sm shadow-sm overflow-hidden">
             <table className="w-full">
@@ -396,12 +393,14 @@ export default function AdminPage() {
                         <button
                           onClick={() => handleEdit(product)}
                           className="p-1 hover:text-accent transition-colors"
+                          title="Edit product"
                         >
                           <Edit size={16} />
                         </button>
                         <button
                           onClick={() => handleDelete(product.id)}
                           className="p-1 hover:text-red-500 transition-colors"
+                          title="Delete product"
                         >
                           <Trash2 size={16} />
                         </button>
@@ -414,7 +413,6 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* Orders Table */}
         {activeTab === 'orders' && (
           <div className="bg-background rounded-sm shadow-sm overflow-hidden">
             <table className="w-full">
